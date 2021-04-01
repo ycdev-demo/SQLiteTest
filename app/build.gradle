@@ -34,20 +34,30 @@ dependencies {
     implementation deps.lifecycle.viewModelKtx
     implementation deps.navigation.fragmentKtx
     implementation deps.navigation.uiKtx
+    implementation deps.sqlite.framework
 
     implementation deps.timber
     implementation deps.ycdev.androidBase
     implementation deps.flexbox
+    implementation "net.zetetic:android-database-sqlcipher:4.4.3"
+    implementation 'io.requery:sqlite-android:3.34.1'
+    implementation 'com.tencent.wcdb:wcdb-android:1.0.8'
+    implementation 'com.tencent.wcdb:room:1.0.8'
 
     testImplementation deps.test.core
     testImplementation deps.test.junit
     testImplementation deps.test.truth
     testImplementation deps.test.mockk
+    testImplementation deps.test.robolectric
     testImplementation deps.ycdev.androidTest
 
     // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation deps.test.core
     androidTestImplementation deps.test.runner
     androidTestImplementation deps.test.rules
+    androidTestImplementation deps.test.junit
     // Espresso dependencies
     androidTestImplementation deps.test.espressoCore
+    // other
+    androidTestImplementation deps.test.truth
 }

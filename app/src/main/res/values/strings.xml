@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">SQLiteTest</string>
+
+    <string name="mode_wal">WAL mode</string>
+
+    <string name="create_db_data">Create DB data</string>
+    <string name="clear_db_data">Clear DB data</string>
+    <string name="query_db_data">Query DB data</string>
 </resources>
