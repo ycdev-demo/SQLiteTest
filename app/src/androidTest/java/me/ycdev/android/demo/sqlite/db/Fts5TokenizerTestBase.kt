@@ -11,7 +11,7 @@ abstract class Fts5TokenizerTestBase {
     abstract fun getSQLiteProvider(): SQLiteProvider
 
     private fun isTokenizerSupported(tokenizer: String): Boolean {
-        return getSQLiteProvider().getDefaultParams().supportedFts4Tokenizer.contains(tokenizer)
+        return getSQLiteProvider().getDefaultParams().supportedFts5Tokenizer.contains(tokenizer)
     }
 
     @Test
