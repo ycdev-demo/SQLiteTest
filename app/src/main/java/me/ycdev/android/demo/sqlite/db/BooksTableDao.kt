@@ -11,7 +11,7 @@ import me.ycdev.android.lib.common.utils.IoUtils
 import timber.log.Timber
 import java.lang.RuntimeException
 
-class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val params: SQLiteParams) {
+class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, val params: SQLiteParams) {
 
     private fun buildContentValues(bookEntry: BookEntry): ContentValues {
         val values = ContentValues()
@@ -24,7 +24,7 @@ class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val p
         val values = buildContentValues(bookEntry)
         db.insert(TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE, values)
         db.insert(FTS4_NAME, SQLiteDatabase.CONFLICT_REPLACE, values)
-        if (params.fts5Supported) {
+        if (params.isFts5Supported()) {
             db.insert(FTS5_NAME, SQLiteDatabase.CONFLICT_REPLACE, values)
         }
     }
@@ -71,10 +71,8 @@ class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val p
         return loadFromCursor(cursor)
     }
 
-    fun isFts5Supported(): Boolean = params.fts5Supported
-
     fun searchWithFts5(text: String): List<BookEntry> {
-        if (!isFts5Supported()) {
+        if (!params.isFts5Supported()) {
             throw RuntimeException("FTS5 not supported")
         }
 
@@ -93,7 +91,7 @@ class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val p
         val db = dbHelper.writableDatabase
         db.execSQL("DELETE FROM $TABLE_NAME")
         db.execSQL("DELETE FROM $FTS4_NAME")
-        if (params.fts5Supported) {
+        if (params.isFts5Supported()) {
             db.execSQL("DELETE FROM $FTS5_NAME")
         }
     }
@@ -133,16 +131,18 @@ class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val p
             db.execSQL(sql)
 
             // FTS4 table
-            db.execSQL("DROP TABLE IF EXISTS $FTS4_NAME")
-            sql = "CREATE VIRTUAL TABLE " + FTS4_NAME + " USING fts4(" +
-                    FIELD_TITLE + "," +
-                    FIELD_DESC + "," +
-                    "tokenize=${params.fts4Tokenizer}" +
-                    ");"
-            db.execSQL(sql)
+            if (params.isFts4TokenizerSupported(params.fts4Tokenizer)) {
+                db.execSQL("DROP TABLE IF EXISTS $FTS4_NAME")
+                sql = "CREATE VIRTUAL TABLE " + FTS4_NAME + " USING fts4(" +
+                        FIELD_TITLE + "," +
+                        FIELD_DESC + "," +
+                        "tokenize=${params.fts4Tokenizer}" +
+                        ");"
+                db.execSQL(sql)
+            }
 
             // FTS5 table
-            if (params.fts5Supported) {
+            if (params.isFts5TokenizerSupported(params.fts4Tokenizer)) {
                 db.execSQL("DROP TABLE IF EXISTS $FTS5_NAME")
                 sql = "CREATE VIRTUAL TABLE " + FTS5_NAME + " USING fts5(" +
                         FIELD_TITLE + "," +

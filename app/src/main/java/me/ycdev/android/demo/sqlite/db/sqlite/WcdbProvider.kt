@@ -10,12 +10,14 @@ class WcdbProvider : SQLiteProvider {
     override fun getDefaultParams(): SQLiteParams {
         return SQLiteParams(
             operatorNotSupported = false,
-            fts5Supported = true,
             supportedFts4Tokenizer = arrayListOf(
                 Tokenizer.SIMPLE,
                 Tokenizer.PORTER,
                 Tokenizer.UNICODE61,
                 Tokenizer.MMICU
+            ),
+            supportedFts5Tokenizer = arrayListOf(
+                Tokenizer.ASCII, Tokenizer.UNICODE61, Tokenizer.PORTER
             )
         )
     }

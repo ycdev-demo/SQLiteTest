@@ -7,73 +7,79 @@ import me.ycdev.android.demo.sqlite.case.BookEntry
 import me.ycdev.android.demo.sqlite.db.sqlite.SQLiteProvider
 import org.junit.Test
 
-abstract class Fts4TokenizerTestBase {
+abstract class FtsTokenizerTestBase {
 
     abstract fun getSQLiteProvider(): SQLiteProvider
 
-    private fun isTokenizerSupported(tokenizer: String): Boolean {
-        return getSQLiteProvider().getDefaultParams().supportedFts4Tokenizer.contains(tokenizer)
-    }
-
     @Test
     fun unicode61() {
-        if (isTokenizerSupported(Tokenizer.UNICODE61)) {
-            executeTest(Tokenizer.UNICODE61, this::testUnicodeCharacters)
-            executeTest(Tokenizer.UNICODE61, this::testArabicCharacters)
-        }
+        executeTest(Tokenizer.UNICODE61, this::testUnicodeCharacters)
+        executeTest(Tokenizer.UNICODE61, this::testArabicCharacters)
     }
 
     @Test
     fun icu() {
-        if (isTokenizerSupported(Tokenizer.ICU)) {
-            executeTest(Tokenizer.ICU, this::testUnicodeCharacters)
-            executeTest(Tokenizer.ICU, this::testArabicCharacters)
-        }
-    }
-
-    @Test
-    fun simple() {
-        if (isTokenizerSupported(Tokenizer.SIMPLE)) {
-            executeTest(Tokenizer.SIMPLE, this::testUnicodeCharacters)
-            executeTest(Tokenizer.SIMPLE, this::testArabicCharacters)
-        }
-    }
-
-    @Test
-    fun porter() {
-        if (isTokenizerSupported(Tokenizer.PORTER)) {
-            executeTest(Tokenizer.PORTER, this::testUnicodeCharacters)
-            executeTest(Tokenizer.PORTER, this::testArabicCharacters)
-        }
+        executeTest(Tokenizer.ICU, this::testUnicodeCharacters)
+        executeTest(Tokenizer.ICU, this::testArabicCharacters)
     }
 
     @Test
     fun mmicu() {
-        if (isTokenizerSupported(Tokenizer.MMICU)) {
-            executeTest(Tokenizer.MMICU, this::testUnicodeCharacters)
-            executeTest(Tokenizer.MMICU, this::testArabicCharacters)
-        }
+        executeTest(Tokenizer.MMICU, this::testUnicodeCharacters)
+        executeTest(Tokenizer.MMICU, this::testArabicCharacters)
     }
 
-    private fun executeTest(tokenizer: String, task: (BooksTableDao, String) -> Unit) {
+    @Test
+    fun simple() {
+        executeTest(Tokenizer.SIMPLE, this::testUnicodeCharacters)
+        executeTest(Tokenizer.SIMPLE, this::testArabicCharacters)
+    }
+
+    @Test
+    fun ascii() {
+        executeTest(Tokenizer.ASCII, this::testUnicodeCharacters)
+        executeTest(Tokenizer.ASCII, this::testArabicCharacters)
+    }
+
+    @Test
+    fun porter() {
+        executeTest(Tokenizer.PORTER, this::testUnicodeCharacters)
+        executeTest(Tokenizer.PORTER, this::testArabicCharacters)
+    }
+
+    private fun executeTest(tokenizer: String, task: (BooksTableDao, FtsVersion) -> Unit) {
         val provider = getSQLiteProvider()
         val sqliteParams = provider.getDefaultParams()
         sqliteParams.fts4Tokenizer = tokenizer
+        sqliteParams.fts5Tokenizer = tokenizer
         val dbHelper = provider.createOpenHelper(ApplicationProvider.getApplicationContext(), sqliteParams)
 
         dbHelper.use {
             val dao = BooksTableDao(it, sqliteParams)
             dao.recreateFtsTables(sqliteParams)
-            dao.clearData()
 
-            task.invoke(dao, tokenizer)
+            if (sqliteParams.isFts4TokenizerSupported(tokenizer)) {
+                dao.clearData()
+                task.invoke(dao, FtsVersion.FTS4)
+            }
+
+            if (sqliteParams.isFts5TokenizerSupported(tokenizer)) {
+                dao.clearData()
+                task.invoke(dao, FtsVersion.FTS5)
+            }
         }
     }
 
-    private fun testUnicodeCharacters(dao: BooksTableDao, tokenizer: String) {
+    private fun testUnicodeCharacters(dao: BooksTableDao, ftsVersion: FtsVersion) {
         assertThat(dao.queryAll()).isEmpty()
 
         dao.saveBook(BookEntry("Love", "Right now, they're very frustrated我们，哈哈"))
+
+        val tokenizer = when (ftsVersion) {
+            FtsVersion.FTS4 -> dao.params.fts4Tokenizer
+            FtsVersion.FTS5 -> dao.params.fts5Tokenizer
+            else -> throw RuntimeException("Not supported FTS: $ftsVersion")
+        }
 
         // check all simple terms
         val expectedTerms = when (tokenizer) {
@@ -82,6 +88,7 @@ abstract class Fts4TokenizerTestBase {
             Tokenizer.PORTER -> arrayOf("right", "now", "thei", "they", "veri", "very")
             else -> arrayOf("right", "now", "they", "re", "very")
         }
+
         for (term in expectedTerms) {
             dao.searchWithFts4(term).let {
                 assertWithMessage("term: %s", term).that(it).hasSize(1)
@@ -94,7 +101,8 @@ abstract class Fts4TokenizerTestBase {
         }
 
         when (tokenizer) {
-            Tokenizer.SIMPLE -> {
+            Tokenizer.SIMPLE,
+            Tokenizer.ASCII -> {
                 // 'frustrated我们，哈哈' is one term
                 dao.searchWithFts4("frustrated").let {
                     assertThat(it).hasSize(0)
@@ -165,12 +173,12 @@ abstract class Fts4TokenizerTestBase {
                 }
             }
             else -> {
-                throw RuntimeException("Not supported")
+                throw RuntimeException("Not supported: $tokenizer")
             }
         }
     }
 
-    private fun testArabicCharacters(dao: BooksTableDao, tokenizer: String) {
+    private fun testArabicCharacters(dao: BooksTableDao, ftsVersion: FtsVersion) {
         assertThat(dao.queryAll()).isEmpty()
 
         // I'll join the meeting.

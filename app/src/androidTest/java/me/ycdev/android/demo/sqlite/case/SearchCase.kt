@@ -29,7 +29,7 @@ class SearchCase(
         if (ftsVersion == FtsVersion.ANY || ftsVersion == FtsVersion.FTS4) {
             executeSearchAndCheckResult { dao.searchWithFts4(words) }
         }
-        if ((ftsVersion == FtsVersion.ANY || ftsVersion == FtsVersion.FTS5) && dao.isFts5Supported()) {
+        if ((ftsVersion == FtsVersion.ANY || ftsVersion == FtsVersion.FTS5) && dao.params.isFts5Supported()) {
             executeSearchAndCheckResult { dao.searchWithFts5(words) }
         }
     }

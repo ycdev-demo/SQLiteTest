@@ -3,11 +3,17 @@ package me.ycdev.android.demo.sqlite.db.sqlite
 import android.content.Context
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import me.ycdev.android.demo.sqlite.db.SQLiteParams
+import me.ycdev.android.demo.sqlite.db.Tokenizer
 import me.ycdev.android.demo.sqlite.db.helper.RequerySQLiteOpenHelper
 
 class RequerySQLiteProvider : SQLiteProvider {
     override fun getDefaultParams(): SQLiteParams {
-        return SQLiteParams(operatorNotSupported = false, fts5Supported = true)
+        return SQLiteParams(
+            operatorNotSupported = false,
+            supportedFts5Tokenizer = arrayListOf(
+                Tokenizer.ASCII, Tokenizer.UNICODE61, Tokenizer.PORTER
+            )
+        )
     }
 
     override fun createOpenHelper(context: Context, params: SQLiteParams): SupportSQLiteOpenHelper {
