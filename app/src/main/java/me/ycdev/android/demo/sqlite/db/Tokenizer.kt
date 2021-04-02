@@ -20,4 +20,7 @@ object Tokenizer {
 
     /** SQLite FTS5 */
     const val ASCII = "ascii"
+
+    /** WCDB FTS5 */
+    const val MMICU = "mmicu"
 }

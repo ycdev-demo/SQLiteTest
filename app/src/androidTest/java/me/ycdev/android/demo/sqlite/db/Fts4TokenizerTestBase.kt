@@ -47,6 +47,14 @@ abstract class Fts4TokenizerTestBase {
         }
     }
 
+    @Test
+    fun mmicu() {
+        if (isTokenizerSupported(Tokenizer.MMICU)) {
+            executeTest(Tokenizer.MMICU, this::testUnicodeCharacters)
+            executeTest(Tokenizer.MMICU, this::testArabicCharacters)
+        }
+    }
+
     private fun executeTest(tokenizer: String, task: (BooksTableDao, String) -> Unit) {
         val provider = getSQLiteProvider()
         val sqliteParams = provider.getDefaultParams()
@@ -69,7 +77,8 @@ abstract class Fts4TokenizerTestBase {
 
         // check all simple terms
         val expectedTerms = when(tokenizer) {
-            Tokenizer.ICU -> arrayOf("right", "now", "they''re", "very")
+            Tokenizer.ICU,
+            Tokenizer.MMICU -> arrayOf("right", "now", "they''re", "very")
             Tokenizer.PORTER -> arrayOf("right", "now", "thei", "they", "veri", "very")
             else -> arrayOf("right", "now", "they", "re", "very")
         }
@@ -142,7 +151,8 @@ abstract class Fts4TokenizerTestBase {
                     assertThat(it).hasSize(0)
                 }
             }
-            Tokenizer.ICU -> {
+            Tokenizer.ICU,
+            Tokenizer.MMICU -> {
                 // there are three terms: "frustrated", "我们" and "哈哈"
                 dao.searchWithFts4("frustrated").let {
                     assertThat(it).hasSize(1)
