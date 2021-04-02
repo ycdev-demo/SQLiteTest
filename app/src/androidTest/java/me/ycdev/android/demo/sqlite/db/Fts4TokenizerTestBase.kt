@@ -3,8 +3,8 @@ package me.ycdev.android.demo.sqlite.db
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import me.ycdev.android.demo.sqlite.case.BookEntry
 import me.ycdev.android.demo.sqlite.db.sqlite.SQLiteProvider
-import me.ycdev.android.demo.sqlite.model.BookEntry
 import org.junit.Test
 
 abstract class Fts4TokenizerTestBase {

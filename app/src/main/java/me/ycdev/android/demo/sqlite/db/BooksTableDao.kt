@@ -6,8 +6,9 @@ import android.database.sqlite.SQLiteDatabase
 import android.provider.BaseColumns
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import me.ycdev.android.demo.sqlite.model.BookEntry
+import me.ycdev.android.demo.sqlite.case.BookEntry
 import me.ycdev.android.lib.common.utils.IoUtils
+import java.lang.RuntimeException
 
 class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val params: SQLiteParams) {
 
@@ -64,7 +65,13 @@ class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val p
         return loadFromCursor(cursor)
     }
 
+    fun isFts5Supported(): Boolean = params.fts5Supported
+
     fun searchWithFts5(text: String): List<BookEntry> {
+        if (!isFts5Supported()) {
+            throw RuntimeException("FTS5 not supported")
+        }
+
         val sql = "SELECT * from $FTS5_NAME WHERE $FTS5_NAME MATCH '$text'"
         val db = dbHelper.readableDatabase
         val cursor = db.query(sql)
