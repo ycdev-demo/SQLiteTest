@@ -8,6 +8,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import me.ycdev.android.demo.sqlite.case.BookEntry
 import me.ycdev.android.lib.common.utils.IoUtils
+import timber.log.Timber
 import java.lang.RuntimeException
 
 class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val params: SQLiteParams) {
@@ -60,6 +61,11 @@ class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val p
 
     fun searchWithFts4(text: String): List<BookEntry> {
         val sql = "SELECT * from $FTS4_NAME WHERE $FTS4_NAME MATCH '$text'"
+        Timber.tag(TAG).d("fts4 sql: $sql")
+        if (text.isEmpty()) {
+            return emptyList()
+        }
+
         val db = dbHelper.readableDatabase
         val cursor = db.query(sql)
         return loadFromCursor(cursor)
@@ -73,6 +79,11 @@ class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val p
         }
 
         val sql = "SELECT * from $FTS5_NAME WHERE $FTS5_NAME MATCH '$text'"
+        Timber.tag(TAG).d("fts5 sql: $sql")
+        if (text.isEmpty()) {
+            return emptyList()
+        }
+
         val db = dbHelper.readableDatabase
         val cursor = db.query(sql)
         return loadFromCursor(cursor)
@@ -93,6 +104,8 @@ class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val p
     }
 
     companion object {
+        private const val TAG = "BooksTableDao"
+
         private const val TABLE_NAME = "books"
         private const val INDEX_TITLE = "books_title_index"
         private const val INDEX_DESC = "books_desc_index"
