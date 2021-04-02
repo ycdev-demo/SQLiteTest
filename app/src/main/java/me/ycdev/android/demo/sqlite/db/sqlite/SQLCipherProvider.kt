@@ -2,8 +2,8 @@ package me.ycdev.android.demo.sqlite.db.sqlite
 
 import android.content.Context
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import me.ycdev.android.demo.sqlite.db.helper.SQLCipherOpenHelper
 import me.ycdev.android.demo.sqlite.db.SQLiteParams
+import me.ycdev.android.demo.sqlite.db.helper.SQLCipherOpenHelper
 
 class SQLCipherProvider : SQLiteProvider {
     override fun getDefaultParams(): SQLiteParams {

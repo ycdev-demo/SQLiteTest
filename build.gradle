@@ -35,6 +35,6 @@ clean {
 spotless {
     kotlin {
         target "**/*.kt"
-        ktlint(versions.ktlint)
+        ktlint(versions.ktlint).userData(['indent_size' : 'unset'])
     }
 }

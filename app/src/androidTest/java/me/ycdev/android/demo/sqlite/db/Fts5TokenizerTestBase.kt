@@ -60,7 +60,7 @@ abstract class Fts5TokenizerTestBase {
         dao.saveBook(BookEntry("Love", "Right now, they're very frustrated我们，哈哈"))
 
         // check all simple terms
-        val expectedTerms = when(tokenizer) {
+        val expectedTerms = when (tokenizer) {
             Tokenizer.ICU -> arrayOf("right", "now", "they''re", "very")
             Tokenizer.PORTER -> arrayOf("right", "now", "thei", "they", "veri", "very")
             else -> arrayOf("right", "now", "they", "re", "very")

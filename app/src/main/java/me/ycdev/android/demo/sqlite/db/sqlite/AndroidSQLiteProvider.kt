@@ -2,9 +2,9 @@ package me.ycdev.android.demo.sqlite.db.sqlite
 
 import android.content.Context
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import me.ycdev.android.demo.sqlite.db.helper.AndroidSQLiteOpenHelper
 import me.ycdev.android.demo.sqlite.db.SQLiteParams
 import me.ycdev.android.demo.sqlite.db.Tokenizer
+import me.ycdev.android.demo.sqlite.db.helper.AndroidSQLiteOpenHelper
 
 class AndroidSQLiteProvider : SQLiteProvider {
     override fun getDefaultParams(): SQLiteParams {

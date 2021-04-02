@@ -52,8 +52,8 @@ class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val p
 
     fun queryAll(): List<BookEntry> {
         val db = dbHelper.readableDatabase
-        val cursor = db.query("SELECT " + FIELD_TITLE + "," + FIELD_DESC
-                + " FROM " + TABLE_NAME + " ORDER BY " + BaseColumns._ID + " ASC")
+        val cursor = db.query("SELECT " + FIELD_TITLE + "," + FIELD_DESC +
+                " FROM " + TABLE_NAME + " ORDER BY " + BaseColumns._ID + " ASC")
         return loadFromCursor(cursor)
     }
 
@@ -88,7 +88,7 @@ class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val p
     companion object {
         private const val TABLE_NAME = "books"
         private const val INDEX_TITLE = "books_title_index"
-        private const val INDEX_DESC = "books_desc_index";
+        private const val INDEX_DESC = "books_desc_index"
         private const val FTS4_NAME = "books_fts4"
         private const val FTS5_NAME = "books_fts5"
 
@@ -103,18 +103,18 @@ class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, private val p
             db.execSQL(sql)
 
             // index for title
-            sql = ("CREATE UNIQUE INDEX IF NOT EXISTS " + INDEX_TITLE + " ON " + TABLE_NAME
-                    + "(" + FIELD_TITLE + ");")
+            sql = ("CREATE UNIQUE INDEX IF NOT EXISTS " + INDEX_TITLE + " ON " + TABLE_NAME +
+                    "(" + FIELD_TITLE + ");")
             db.execSQL(sql)
 
             // index for desc
-            sql = ("CREATE UNIQUE INDEX IF NOT EXISTS " + INDEX_DESC + " ON " + TABLE_NAME
-                    + "(" + FIELD_DESC + ");")
+            sql = ("CREATE UNIQUE INDEX IF NOT EXISTS " + INDEX_DESC + " ON " + TABLE_NAME +
+                    "(" + FIELD_DESC + ");")
             db.execSQL(sql)
 
             // FTS4 table
             db.execSQL("DROP TABLE IF EXISTS $FTS4_NAME")
-            sql = "CREATE VIRTUAL TABLE " +  FTS4_NAME + " USING fts4(" +
+            sql = "CREATE VIRTUAL TABLE " + FTS4_NAME + " USING fts4(" +
                     FIELD_TITLE + "," +
                     FIELD_DESC + "," +
                     "tokenize=${params.fts4Tokenizer}" +
