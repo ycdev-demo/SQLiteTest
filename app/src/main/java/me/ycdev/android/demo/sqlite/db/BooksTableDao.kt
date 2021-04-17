@@ -142,7 +142,7 @@ class BooksTableDao(private val dbHelper: SupportSQLiteOpenHelper, val params: S
             }
 
             // FTS5 table
-            if (params.isFts5TokenizerSupported(params.fts4Tokenizer)) {
+            if (params.isFts5TokenizerSupported(params.fts5Tokenizer)) {
                 db.execSQL("DROP TABLE IF EXISTS $FTS5_NAME")
                 sql = "CREATE VIRTUAL TABLE " + FTS5_NAME + " USING fts5(" +
                         FIELD_TITLE + "," +

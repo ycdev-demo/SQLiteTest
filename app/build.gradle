@@ -39,7 +39,8 @@ dependencies {
     implementation deps.timber
     implementation deps.ycdev.androidBase
     implementation deps.flexbox
-    implementation "net.zetetic:android-database-sqlcipher:4.4.3"
+//    implementation "net.zetetic:android-database-sqlcipher:4.4.3"
+    implementation files('android-database-sqlcipher-4.4.3.yc-release.aar')
     implementation 'io.requery:sqlite-android:3.34.1'
     implementation 'com.tencent.wcdb:wcdb-android:1.0.8'
     implementation 'com.tencent.wcdb:room:1.0.8'

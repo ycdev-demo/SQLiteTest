@@ -20,7 +20,9 @@ object SQLCipherOpenHelper {
             .callback(MyCallback(params))
             .build()
 
-        return SupportFactory(params.password.toByteArray()).create(config)
+        return SupportFactory(params.password.toByteArray()).create(config).apply {
+            setWriteAheadLoggingEnabled(params.walEnabled)
+        }
     }
 
     private class MyCallback(private val params: SQLiteParams) :
