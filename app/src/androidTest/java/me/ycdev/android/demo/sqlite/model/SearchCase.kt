@@ -1,6 +1,5 @@
 package me.ycdev.android.demo.sqlite.model
 
-import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import me.ycdev.android.demo.sqlite.db.FtsTableDao
 import me.ycdev.android.demo.sqlite.db.FtsVersion
@@ -28,24 +27,24 @@ class SearchCase(
     fun execute(dao: FtsTableDao) {
         val words = if (normalize) SearchNormalizer.normalize(searchWords) else searchWords
         if (ftsVersion == FtsVersion.ANY || ftsVersion == FtsVersion.FTS4) {
-            executeSearchAndCheckResult { dao.searchWithFts4(words) }
+            executeSearchAndCheckResult("FTS4 search failed") { dao.searchWithFts4(words) }
         }
         if ((ftsVersion == FtsVersion.ANY || ftsVersion == FtsVersion.FTS5) && dao.params.isFts5Supported()) {
-            executeSearchAndCheckResult { dao.searchWithFts5(words) }
+            executeSearchAndCheckResult("FTS5 search failed") { dao.searchWithFts5(words) }
         }
     }
 
-    private fun executeSearchAndCheckResult(searchTask: () -> List<DataEntry>) {
+    private fun executeSearchAndCheckResult(message: String, searchTask: () -> List<DataEntry>) {
         try {
             val result = searchTask.invoke()
             if (illegal) {
                 fail("\"$searchWords\" is expected to be illegal")
             }
 
-            assertThat(result).hasSize(matchedCount)
+            assertWithMessage(message).that(result).hasSize(matchedCount)
             if (titlesToCheck != null) {
                 for (i in 0 until matchedCount) {
-                    assertWithMessage("Failed at index#$i").that(result[i].title).isEqualTo(titlesToCheck[i])
+                    assertWithMessage("$message at index#$i").that(result[i].title).isEqualTo(titlesToCheck[i])
                 }
             }
         } catch (e: Exception) {
