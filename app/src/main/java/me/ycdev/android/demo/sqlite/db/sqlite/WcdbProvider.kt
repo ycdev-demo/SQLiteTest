@@ -23,6 +23,13 @@ class WcdbProvider : SQLiteProvider {
     }
 
     override fun createOpenHelper(context: Context, params: SQLiteParams): SupportSQLiteOpenHelper {
-        return WcdbOpenHelper.create(context, params)
+        return WcdbOpenHelper.create(context, params, "wcdb_test.db")
+    }
+
+    override fun createPerfOpenHelper(
+        context: Context,
+        params: SQLiteParams
+    ): SupportSQLiteOpenHelper {
+        return WcdbOpenHelper.create(context, params, "wcdb_perf_test.db")
     }
 }

@@ -17,6 +17,13 @@ class RequerySQLiteProvider : SQLiteProvider {
     }
 
     override fun createOpenHelper(context: Context, params: SQLiteParams): SupportSQLiteOpenHelper {
-        return RequerySQLiteOpenHelper.create(context, params)
+        return RequerySQLiteOpenHelper.create(context, params, "requerysqlite_test.db")
+    }
+
+    override fun createPerfOpenHelper(
+        context: Context,
+        params: SQLiteParams
+    ): SupportSQLiteOpenHelper {
+        return RequerySQLiteOpenHelper.create(context, params, "requerysqlite_perf_test.db")
     }
 }

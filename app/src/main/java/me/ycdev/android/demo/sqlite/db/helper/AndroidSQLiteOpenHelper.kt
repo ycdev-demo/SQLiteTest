@@ -4,19 +4,18 @@ import android.content.Context
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
-import me.ycdev.android.demo.sqlite.db.BooksTableDao
+import me.ycdev.android.demo.sqlite.db.FtsTableDao
 import me.ycdev.android.demo.sqlite.db.SQLiteParams
 import timber.log.Timber
 
 object AndroidSQLiteOpenHelper {
     private const val TAG = "AndroidSQLiteOpenHelper"
 
-    private const val DB_NAME = "books_androidsqlite.db"
     private const val DB_VERSION = 1
 
-    fun create(context: Context, params: SQLiteParams): SupportSQLiteOpenHelper {
+    fun create(context: Context, params: SQLiteParams, dbName: String): SupportSQLiteOpenHelper {
         val config = SupportSQLiteOpenHelper.Configuration.builder(context)
-            .name(DB_NAME)
+            .name(dbName)
             .callback(MyCallback(params))
             .build()
         return FrameworkSQLiteOpenHelperFactory().create(config).apply {
@@ -29,7 +28,7 @@ object AndroidSQLiteOpenHelper {
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             Timber.tag(TAG).i("onCreate")
-            BooksTableDao.createTableAndIndexes(db, params)
+            FtsTableDao.createTableAndIndexes(db, params)
         }
 
         override fun onUpgrade(db: SupportSQLiteDatabase, oldVersion: Int, newVersion: Int) {

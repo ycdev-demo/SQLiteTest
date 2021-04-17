@@ -17,6 +17,13 @@ class SQLCipherProvider : SQLiteProvider {
     }
 
     override fun createOpenHelper(context: Context, params: SQLiteParams): SupportSQLiteOpenHelper {
-        return SQLCipherOpenHelper.create(context, params)
+        return SQLCipherOpenHelper.create(context, params, "sqlcipher_test.db")
+    }
+
+    override fun createPerfOpenHelper(
+        context: Context,
+        params: SQLiteParams
+    ): SupportSQLiteOpenHelper {
+        return SQLCipherOpenHelper.create(context, params, "sqlcipher_perf_test.db")
     }
 }

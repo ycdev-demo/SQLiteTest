@@ -7,4 +7,5 @@ import me.ycdev.android.demo.sqlite.db.SQLiteParams
 interface SQLiteProvider {
     fun getDefaultParams(): SQLiteParams
     fun createOpenHelper(context: Context, params: SQLiteParams): SupportSQLiteOpenHelper
+    fun createPerfOpenHelper(context: Context, params: SQLiteParams): SupportSQLiteOpenHelper
 }

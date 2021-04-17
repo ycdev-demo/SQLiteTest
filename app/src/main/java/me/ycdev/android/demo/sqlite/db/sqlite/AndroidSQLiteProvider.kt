@@ -19,6 +19,13 @@ class AndroidSQLiteProvider : SQLiteProvider {
     }
 
     override fun createOpenHelper(context: Context, params: SQLiteParams): SupportSQLiteOpenHelper {
-        return AndroidSQLiteOpenHelper.create(context, params)
+        return AndroidSQLiteOpenHelper.create(context, params, "androidsqlite_test.db")
+    }
+
+    override fun createPerfOpenHelper(
+        context: Context,
+        params: SQLiteParams
+    ): SupportSQLiteOpenHelper {
+        return AndroidSQLiteOpenHelper.create(context, params, "androidsqlite_perf_test.db")
     }
 }

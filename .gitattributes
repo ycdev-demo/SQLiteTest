@@ -1,0 +1,2 @@
+app/src/main/assets/amazon_reviews_phone.dat filter=lfs diff=lfs merge=lfs -text
+dataset/Cell_Phones_and_Accessories_5.json.gz filter=lfs diff=lfs merge=lfs -text

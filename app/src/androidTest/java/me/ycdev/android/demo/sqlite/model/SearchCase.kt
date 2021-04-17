@@ -1,7 +1,8 @@
-package me.ycdev.android.demo.sqlite.case
+package me.ycdev.android.demo.sqlite.model
 
 import com.google.common.truth.Truth.assertThat
-import me.ycdev.android.demo.sqlite.db.BooksTableDao
+import com.google.common.truth.Truth.assertWithMessage
+import me.ycdev.android.demo.sqlite.db.FtsTableDao
 import me.ycdev.android.demo.sqlite.db.FtsVersion
 import me.ycdev.android.demo.sqlite.db.SearchNormalizer
 import org.junit.Assert.fail
@@ -24,7 +25,7 @@ class SearchCase(
         normalize: Boolean = false
     ) : this(searchWords, 1, ftsVersion, normalize, false, arrayOf(titleToCheck))
 
-    fun execute(dao: BooksTableDao) {
+    fun execute(dao: FtsTableDao) {
         val words = if (normalize) SearchNormalizer.normalize(searchWords) else searchWords
         if (ftsVersion == FtsVersion.ANY || ftsVersion == FtsVersion.FTS4) {
             executeSearchAndCheckResult { dao.searchWithFts4(words) }
@@ -34,7 +35,7 @@ class SearchCase(
         }
     }
 
-    private fun executeSearchAndCheckResult(searchTask: () -> List<BookEntry>) {
+    private fun executeSearchAndCheckResult(searchTask: () -> List<DataEntry>) {
         try {
             val result = searchTask.invoke()
             if (illegal) {
@@ -44,7 +45,7 @@ class SearchCase(
             assertThat(result).hasSize(matchedCount)
             if (titlesToCheck != null) {
                 for (i in 0 until matchedCount) {
-                    assertThat(result[i].title).isEqualTo(titlesToCheck[i])
+                    assertWithMessage("Failed at index#$i").that(result[i].title).isEqualTo(titlesToCheck[i])
                 }
             }
         } catch (e: Exception) {

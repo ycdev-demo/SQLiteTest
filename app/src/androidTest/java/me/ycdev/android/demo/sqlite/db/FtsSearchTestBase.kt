@@ -3,10 +3,10 @@ package me.ycdev.android.demo.sqlite.db
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
-import me.ycdev.android.demo.sqlite.case.BookEntry
-import me.ycdev.android.demo.sqlite.case.SearchCase
-import me.ycdev.android.demo.sqlite.case.execute
+import me.ycdev.android.demo.sqlite.model.SearchCase
+import me.ycdev.android.demo.sqlite.model.execute
 import me.ycdev.android.demo.sqlite.db.sqlite.SQLiteProvider
+import me.ycdev.android.demo.sqlite.model.DataEntry
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -14,7 +14,7 @@ import org.junit.Test
 abstract class FtsSearchTestBase {
     private lateinit var sqliteParams: SQLiteParams
     private lateinit var dbHelper: SupportSQLiteOpenHelper
-    private lateinit var dao: BooksTableDao
+    private lateinit var dao: FtsTableDao
 
     abstract fun getSQLiteProvider(): SQLiteProvider
 
@@ -24,9 +24,9 @@ abstract class FtsSearchTestBase {
         sqliteParams = provider.getDefaultParams()
         dbHelper = provider.createOpenHelper(ApplicationProvider.getApplicationContext(), sqliteParams)
 
-        dao = BooksTableDao(dbHelper, sqliteParams)
-        dao.recreateFtsTables(sqliteParams)
+        dao = FtsTableDao(dbHelper, sqliteParams)
         dao.clearData()
+        dao.recreateFtsTables(sqliteParams)
     }
 
     @After
@@ -38,8 +38,8 @@ abstract class FtsSearchTestBase {
     fun checkDb() {
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
-        dao.saveBook(BookEntry("C++ Primer", "A famous book about the C++ language"))
+        dao.saveItem(DataEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
+        dao.saveItem(DataEntry("C++ Primer", "A famous book about the C++ language"))
 
         dao.queryAll().let {
             assertThat(it).hasSize(2)
@@ -52,8 +52,8 @@ abstract class FtsSearchTestBase {
     fun search_basic() {
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
-        dao.saveBook(BookEntry("C++ Primer", "A famous book about the C++ language"))
+        dao.saveItem(DataEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
+        dao.saveItem(DataEntry("C++ Primer", "A famous book about the C++ language"))
 
         dao.execute(SearchCase("Primer", "C++ Primer"))
         dao.execute(SearchCase("treasure", "The Pirate Pat"))
@@ -64,8 +64,8 @@ abstract class FtsSearchTestBase {
     fun search_noCase() {
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
-        dao.saveBook(BookEntry("C++ Primer", "A famous book about the C++ language"))
+        dao.saveItem(DataEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
+        dao.saveItem(DataEntry("C++ Primer", "A famous book about the C++ language"))
 
         dao.execute(SearchCase("Primer", "C++ Primer"))
         dao.execute(SearchCase("primer", "C++ Primer"))
@@ -76,8 +76,8 @@ abstract class FtsSearchTestBase {
     fun search_spacesAround() {
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
-        dao.saveBook(BookEntry("C++ Primer", "A famous book about the C++ language"))
+        dao.saveItem(DataEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
+        dao.saveItem(DataEntry("C++ Primer", "A famous book about the C++ language"))
 
         dao.execute(SearchCase("Primer ", "C++ Primer"))
         dao.execute(SearchCase(",primer ", "C++ Primer", FtsVersion.FTS4))
@@ -88,8 +88,8 @@ abstract class FtsSearchTestBase {
     fun search_partial() {
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
-        dao.saveBook(BookEntry("C++ Primer", "A famous book about the C++ language"))
+        dao.saveItem(DataEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
+        dao.saveItem(DataEntry("C++ Primer", "A famous book about the C++ language"))
 
         // supported prefix
         dao.execute(SearchCase("prim*", "C++ Primer"))
@@ -106,8 +106,8 @@ abstract class FtsSearchTestBase {
     fun search_begin() {
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
-        dao.saveBook(BookEntry("C++ Primer", "A famous book about the C++ language"))
+        dao.saveItem(DataEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
+        dao.saveItem(DataEntry("C++ Primer", "A famous book about the C++ language"))
 
         dao.execute(SearchCase("^C", "C++ Primer"))
         dao.execute(SearchCase("^Primer", 0))
@@ -118,8 +118,8 @@ abstract class FtsSearchTestBase {
     fun search_phrase() {
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
-        dao.saveBook(BookEntry("C++ Primer", "A famous book about the C++ language"))
+        dao.saveItem(DataEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
+        dao.saveItem(DataEntry("C++ Primer", "A famous book about the C++ language"))
 
         dao.execute(SearchCase("\"famous book\"", "C++ Primer"))
         // In FTS4, "famous + book" is same to "famous book"
@@ -146,8 +146,8 @@ abstract class FtsSearchTestBase {
     fun search_near() {
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
-        dao.saveBook(BookEntry("Kotlin Primer", "An incoming book about the Kotlin language"))
+        dao.saveItem(DataEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
+        dao.saveItem(DataEntry("Kotlin Primer", "An incoming book about the Kotlin language"))
 
         dao.execute(SearchCase("book NEAR/2 Kotlin", "Kotlin Primer", FtsVersion.FTS4))
         dao.execute(SearchCase("NEAR(book Kotlin, 2)", "Kotlin Primer", FtsVersion.FTS5))
@@ -170,8 +170,8 @@ abstract class FtsSearchTestBase {
     fun search_and() {
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
-        dao.saveBook(BookEntry("C++ Primer", "A famous book about the C++ language"))
+        dao.saveItem(DataEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
+        dao.saveItem(DataEntry("C++ Primer", "A famous book about the C++ language"))
 
         // implicit "AND"
         dao.execute(SearchCase("C++ primer book", "C++ Primer", FtsVersion.FTS4))
@@ -194,8 +194,8 @@ abstract class FtsSearchTestBase {
     fun search_or() {
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
-        dao.saveBook(BookEntry("C++ Primer", "A famous book about the C++ language"))
+        dao.saveItem(DataEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
+        dao.saveItem(DataEntry("C++ Primer", "A famous book about the C++ language"))
 
         dao.execute(SearchCase("primer OR pirate", arrayOf("The Pirate Pat", "C++ Primer")))
         dao.execute(SearchCase("WeChat OR pirate", "The Pirate Pat"))
@@ -212,8 +212,8 @@ abstract class FtsSearchTestBase {
 
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
-        dao.saveBook(BookEntry("C++ Primer", "A famous book about the C++ language"))
+        dao.saveItem(DataEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
+        dao.saveItem(DataEntry("C++ Primer", "A famous book about the C++ language"))
 
         dao.execute(SearchCase("the", arrayOf("The Pirate Pat", "C++ Primer")))
         dao.execute(SearchCase("the -primer", "The Pirate Pat"))
@@ -226,13 +226,13 @@ abstract class FtsSearchTestBase {
         // FTS4/simple & FTS5/ascii terms:
         //   the, pirate, pat, a, story, about, a, pirate, named, pat,
         //   who, searched, and, found, the, treasure
-        dao.saveBook(BookEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
+        dao.saveItem(DataEntry("The Pirate Pat", "A story about a pirate named Pat who searched and found the treasure."))
 
         // FTS4/simple & FTS5/ascii terms: c, primer, a, famous, book, about, the, c, language
-        dao.saveBook(BookEntry("C++ Primer", "A famous book about the C++ language!!!"))
+        dao.saveItem(DataEntry("C++ Primer", "A famous book about the C++ language!!!"))
 
         // FTS4/simple & FTS5/ascii terms: goodbye, h, m, was, closed
-        dao.saveBook(BookEntry("Goodbye", "H&M was closed"))
+        dao.saveItem(DataEntry("Goodbye", "H&M was closed"))
 
         // uer input: pat stor
         // In FTS4/simple & FTS5/ascii, the query "pat story" terms: pat, story
@@ -271,7 +271,7 @@ abstract class FtsSearchTestBase {
     fun search_queryPatterns() {
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("Go", "We are family 123!?"))
+        dao.saveItem(DataEntry("Go", "We are family 123!?"))
 
         // user input: we are family
         dao.execute(SearchCase("we are family", 1))

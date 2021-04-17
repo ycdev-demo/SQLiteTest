@@ -3,8 +3,8 @@ package me.ycdev.android.demo.sqlite.db
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
-import me.ycdev.android.demo.sqlite.case.BookEntry
 import me.ycdev.android.demo.sqlite.db.sqlite.SQLiteProvider
+import me.ycdev.android.demo.sqlite.model.DataEntry
 import org.junit.Test
 
 abstract class FtsTokenizerTestBase {
@@ -47,7 +47,7 @@ abstract class FtsTokenizerTestBase {
         executeTest(Tokenizer.PORTER, this::testArabicCharacters)
     }
 
-    private fun executeTest(tokenizer: String, task: (BooksTableDao, FtsVersion) -> Unit) {
+    private fun executeTest(tokenizer: String, task: (FtsTableDao, FtsVersion) -> Unit) {
         val provider = getSQLiteProvider()
         val sqliteParams = provider.getDefaultParams()
         sqliteParams.fts4Tokenizer = tokenizer
@@ -55,7 +55,7 @@ abstract class FtsTokenizerTestBase {
         val dbHelper = provider.createOpenHelper(ApplicationProvider.getApplicationContext(), sqliteParams)
 
         dbHelper.use {
-            val dao = BooksTableDao(it, sqliteParams)
+            val dao = FtsTableDao(it, sqliteParams)
             dao.recreateFtsTables(sqliteParams)
 
             if (sqliteParams.isFts4TokenizerSupported(tokenizer)) {
@@ -70,10 +70,10 @@ abstract class FtsTokenizerTestBase {
         }
     }
 
-    private fun testUnicodeCharacters(dao: BooksTableDao, ftsVersion: FtsVersion) {
+    private fun testUnicodeCharacters(dao: FtsTableDao, ftsVersion: FtsVersion) {
         assertThat(dao.queryAll()).isEmpty()
 
-        dao.saveBook(BookEntry("Love", "Right now, they're very frustrated我们，哈哈"))
+        dao.saveItem(DataEntry("Love", "Right now, they're very frustrated我们，哈哈"))
 
         val tokenizer = when (ftsVersion) {
             FtsVersion.FTS4 -> dao.params.fts4Tokenizer
@@ -178,11 +178,11 @@ abstract class FtsTokenizerTestBase {
         }
     }
 
-    private fun testArabicCharacters(dao: BooksTableDao, ftsVersion: FtsVersion) {
+    private fun testArabicCharacters(dao: FtsTableDao, ftsVersion: FtsVersion) {
         assertThat(dao.queryAll()).isEmpty()
 
         // I'll join the meeting.
-        dao.saveBook(BookEntry("Meeting", "سأشارك في الاجتماع."))
+        dao.saveItem(DataEntry("Meeting", "سأشارك في الاجتماع."))
 
         // check all simple terms
         val expectedTerms = arrayOf("سأشارك", "في", "الاجتماع")
