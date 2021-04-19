@@ -13,5 +13,11 @@ class SQLCipherTest {
             Tokenizer.PORTER,
             Tokenizer.UNICODE61
         )
+        assertThat(params.supportedFts5Tokenizer).containsExactly(
+            Tokenizer.ASCII,
+            Tokenizer.UNICODE61,
+            Tokenizer.PORTER,
+        )
+        assertThat(params.isFts5Supported()).isTrue()
     }
 }

@@ -135,7 +135,6 @@ abstract class FtsTokenizerTestBase {
                 dao.execute(SearchCase("不", 0, ftsVersion))
             }
             Tokenizer.ICU  -> { // FTS4 only
-                // TODO many dependence on Android system
                 // there are many terms: "frustrated", "哈哈", "不是", "这样", "的"
                 dao.execute(SearchCase("frustrated", 1, ftsVersion))
                 dao.execute(SearchCase("哈哈", 1, ftsVersion))
