@@ -165,19 +165,19 @@ class FtsTableDao(private val dbHelper: SupportSQLiteOpenHelper, val params: SQL
          * Params:
          * + %1$s: index table name
          */
-        private const val SELECT_SQL = ("SELECT " + FIELD_DATA_ID
-                + "," + FIELD_TITLE + "," + FIELD_DESC + "," + FIELD_AUTHOR
-                + " from " + TABLE_META + " INNER JOIN %1\$s"
-                + " on " + TABLE_META + "." + BaseColumns._ID + "=" + "%1\$s.rowid")
+        private const val SELECT_SQL = ("SELECT " + FIELD_DATA_ID +
+                "," + FIELD_TITLE + "," + FIELD_DESC + "," + FIELD_AUTHOR +
+                " from " + TABLE_META + " INNER JOIN %1\$s" +
+                " on " + TABLE_META + "." + BaseColumns._ID + "=" + "%1\$s.rowid")
         /**
          * Params:
          * + %1$s: index table name
          * + %2$s: key words for the search
          */
-        private const val SEARCH_SQL: String = (SELECT_SQL
-                + " WHERE %1\$s MATCH '%2\$s'"
-                + " ORDER BY " + BaseColumns._ID + " ASC"
-                + " LIMIT " + SEARCH_MAX_COUNT)
+        private const val SEARCH_SQL: String = (SELECT_SQL +
+                " WHERE %1\$s MATCH '%2\$s'" +
+                " ORDER BY " + BaseColumns._ID + " ASC" +
+                " LIMIT " + SEARCH_MAX_COUNT)
         /**
          * Params:
          * + %1$s: index table name

@@ -3,10 +3,10 @@ package me.ycdev.android.demo.sqlite.db
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
-import me.ycdev.android.demo.sqlite.model.SearchCase
-import me.ycdev.android.demo.sqlite.model.execute
 import me.ycdev.android.demo.sqlite.db.sqlite.SQLiteProvider
 import me.ycdev.android.demo.sqlite.model.DataEntry
+import me.ycdev.android.demo.sqlite.model.SearchCase
+import me.ycdev.android.demo.sqlite.model.execute
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
